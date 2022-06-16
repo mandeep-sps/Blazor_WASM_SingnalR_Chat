@@ -47,12 +47,14 @@ namespace BlazorChat.Server
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => 
+            options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddIdentityServer()
+            var identityBuilder = services.AddIdentityServer();
+            identityBuilder
                 .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-
+            identityBuilder.AddSigningCredentials();
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
@@ -63,6 +65,7 @@ namespace BlazorChat.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
