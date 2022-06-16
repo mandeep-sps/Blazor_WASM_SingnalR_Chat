@@ -35,7 +35,9 @@
     public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub")).Build();
+        hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub"))
+        .WithAutomaticReconnect()
+        .Build();
         await hubConnection.StartAsync();
         hubConnection.On<string, string, string>("ReceiveChatNotification", (message, receiverUserId, senderUserId) =>
         {
