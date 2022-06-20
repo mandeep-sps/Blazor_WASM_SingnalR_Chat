@@ -1,11 +1,68 @@
 ﻿@page "/home"
 @page "/"
-@using System.Security.Claims;
-<MudContainer Style="display: inline-block; position: fixed; top: 0; bottom: 0; left: 0; right: 0; width: 900px; height: 300px; margin: auto; ">
-    <MudGrid>
-        <MudItem xs="12" sm="12" md="12">
-            <MudText Align="Align.Center" Typo="Typo.h2" Class="mt-4">Blazor Chat</MudText>
+@using System.ComponentModel.DataAnnotations
+
+
+<div >
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid Justify="Justify.Center" Style="margin-top: 80px !important; ">
+        <MudItem xs="12" sm="5">
+            <MudCard Elevation="25">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+
+                <MudCardContent>
+                    <MudTextField  Label="Email" Class="mt-3" @bind-Value="model.Email" HelperText="Enter your Email" For="@(() => model.Email)" />
+                    <MudTextField  Label="Password" HelperText="Enter your password" Class="mt-3" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" EndIcon="@Icons.Material.Outlined.Login" Color="Color.Primary" Class="ml-auto">Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+            <MudPaper Class="pa-4 mt-4 " Elevation="25">
+                <MudText Align="Align.Center">
+                    Don't have an account <MudLink Href="/register" Typo="Typo.body2">click here</MudLink> to register.
+                </MudText>
+            </MudPaper>
         </MudItem>
-        
     </MudGrid>
-</MudContainer>
+</EditForm>
+</div>
+
+
+@code {
+    RegisterAccountForm model = new RegisterAccountForm();
+    bool success;
+
+    public class RegisterAccountForm
+    {
+        [Required]
+        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
+        public string Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; }
+
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+
+}

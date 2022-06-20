@@ -4,19 +4,27 @@
 @inject SignOutSessionStateManager SignOutManager
 <AuthorizeView>
     <Authorized>
+        <div style="margin-left:30px;">
+            <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Chat"> Chat</MudButton>
+        </div>
+        <MudSpacer />
         <div class="pa-4 justify-center my-4 mud-text-align-center">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Link="authentication/profile">Hi, @context.User.Identity.Name!</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="BeginSignOut">Log Out</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2" Link="authentication/profile">Hi, @context.User.Identity.Name! </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Filled.Logout" OnClick="BeginSignOut">Log Out</MudButton>
         </div>
     </Authorized>
     <NotAuthorized>
+        <div style="margin-left:30px;">
+            <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Dashboard"> Chat</MudButton>
+        </div>
+        <MudSpacer />
         <div class="pa-4 justify-center my-4 mud-text-align-center">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Link="authentication/register">Register</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" Link="authentication/login">Log in</MudButton>
+            <MudButton Variant="Variant.Filled" Class="mr-2" Color="Color.Primary" EndIcon="@Icons.Filled.PersonAddAlt1" Link="/register">Register</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" EndIcon="@Icons.Filled.Login" Link="/">Log in</MudButton>
         </div>
     </NotAuthorized>
 </AuthorizeView>
-@code{
+@code {
     private async Task BeginSignOut(MouseEventArgs args)
     {
         await SignOutManager.SetSignOutState();

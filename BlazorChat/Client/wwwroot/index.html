@@ -9,7 +9,78 @@
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 <body>
-    <div id="app">Loading...</div>
+    <div id="app">
+        <style>
+            @keyframes slide {
+                0% {
+                    transform: translateX(-25%);
+                }
+
+                100% {
+                    transform: translateX(25%);
+                }
+            }
+
+            .mud-wasm {
+                animation: slide 3s ease-in-out infinite alternate;
+                background-image: linear-gradient(-60deg,#1E88E5 50%,#0069c0 50%);
+                bottom: 0;
+                left: -50%;
+                opacity: .5;
+                position: fixed;
+                right: -50%;
+                top: 0;
+                z-index: -1
+            }
+
+            .mud-wasm-cont {
+                left: 50%;
+                padding: 10vmin;
+                position: fixed;
+                text-align: center;
+                top: 50%;
+                transform: translate(-50%,-50%)
+            }
+        </style>
+
+        <div style="height:100%;width:100%;margin:0;position:fixed;">
+            <div class="mud-wasm"></div>
+            <div class="mud-wasm" style="animation-direction:alternate-reverse;animation-duration:4s;"></div>
+            <div class="mud-wasm" style="animation-duration:5s;"></div>
+            <div class="mud-wasm-cont ">
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                     width="200.000000pt" height="200.000000pt" viewBox="0 0 200.000000 200.000000"
+                     preserveAspectRatio="xMidYMid meet">
+                    <metadata>
+                        Created by potrace 1.16, written by Peter Selinger 2001-2019
+                    </metadata>
+                    <g transform="translate(0.000000,200.000000) scale(0.100000,-0.100000)"
+                       fill="#000000" stroke="none">
+                        <path d="M363 1805 c-77 -21 -130 -51 -188 -106 -52 -49 -101 -132 -107 -179
+-2 -14 -7 -31 -12 -39 -5 -7 -9 -48 -9 -90 -1 -90 22 -168 66 -226 37 -49 127
+-126 168 -143 29 -12 30 -12 18 9 -6 12 15 -5 47 -37 33 -33 96 -81 141 -107
+150 -86 185 -198 95 -299 l-37 -42 33 20 c18 10 43 28 55 39 18 16 20 17 14 2
+-11 -28 87 -23 141 8 23 13 40 20 37 16 -11 -18 -96 -62 -107 -55 -6 4 -8 3
+-5 -4 11 -16 -79 -42 -145 -42 -32 0 -77 6 -100 13 -57 17 -147 102 -187 176
+l-32 60 -47 -20 c-91 -39 -192 -91 -192 -99 0 -36 65 -142 125 -204 184 -187
+505 -196 678 -18 159 164 166 434 16 597 -45 49 -174 138 -319 219 -162 92
+-200 157 -151 255 52 101 187 104 258 4 l27 -38 70 3 c75 3 165 29 173 49 8
+21 -48 122 -94 168 -106 106 -280 150 -430 110z" />
+                        <path d="M1544 1783 c-3 -10 -10 -29 -15 -43 -5 -14 -13 -43 -18 -65 -5 -22
+-13 -50 -16 -61 -6 -19 -2 -22 41 -29 157 -23 311 -130 376 -260 19 -37 33
+-86 20 -67 -13 20 -182 29 -193 10 -6 -9 -9 -1 -10 22 0 19 -7 58 -14 85 l-13
+50 -1 -56 c-2 -106 -47 -186 -118 -210 -51 -17 -39 -25 37 -24 65 0 69 -1 64
+-20 -12 -36 -66 -104 -106 -132 -22 -15 -70 -38 -107 -51 l-66 -23 120 5 c173
+6 281 48 363 141 98 111 120 371 45 537 -52 116 -158 181 -330 203 -46 6 -54
+4 -59 -12z" />
+                        <path d="M1100 1218 c0 -200 4 -369 9 -376 6 -10 24 5 67 55 32 37 61 70 64
+73 3 3 37 41 76 85 l71 80 2 223 3 222 -146 0 -146 0 0 -362z" />
+                    </g>
+                </svg>
+
+            </div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
