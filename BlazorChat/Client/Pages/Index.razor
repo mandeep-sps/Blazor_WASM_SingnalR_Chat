@@ -1,68 +1,78 @@
 ﻿@page "/home"
 @page "/"
-@using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Headers
 
+<MudOverlay LightBackground=true Visible="isVisible" Absolute="true">
+    <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+</MudOverlay>
 
-<div >
-    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudGrid Justify="Justify.Center" Style="margin-top: 80px !important; ">
-        <MudItem xs="12" sm="5">
-            <MudCard Elevation="25">
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
+<div>
+    <EditForm Model="@model" OnValidSubmit="(()=>OnValidSubmit(model))">
+        <DataAnnotationsValidator />
+        <MudGrid Justify="Justify.Center" Style="margin-top: 80px !important; ">
+            <MudItem xs="12" sm="5">
+                <MudCard Elevation="25">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
 
-                <MudCardContent>
-                    <MudTextField  Label="Email" Class="mt-3" @bind-Value="model.Email" HelperText="Enter your Email" For="@(() => model.Email)" />
-                    <MudTextField  Label="Password" HelperText="Enter your password" Class="mt-3" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                    <MudCardContent>
+                        <MudTextField Label="Email" Class="mt-3" @bind-Value="model.Email" HelperText="Enter your Email" For="@(() => model.Email)" />
+                        <MudTextField Label="Password" HelperText="Enter your password" Class="mt-3" @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                    </MudCardContent>
 
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" EndIcon="@Icons.Material.Outlined.Login" Color="Color.Primary" Class="ml-auto">Login</MudButton>
-                </MudCardActions>
-            </MudCard>
-            <MudPaper Class="pa-4 mt-4 " Elevation="25">
-                <MudText Align="Align.Center">
-                    Don't have an account <MudLink Href="/register" Typo="Typo.body2">click here</MudLink> to register.
-                </MudText>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" EndIcon="@Icons.Material.Outlined.Login" Class="ml-auto" Color="Color.Primary" Variant="Variant.Outlined">
+                            Login
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+                <MudPaper Class="pa-4 mt-4 " Elevation="25">
+                    <MudText Align="Align.Center">
+                        Don't have an account <MudLink Href="/register" Typo="Typo.body2">click here</MudLink> to register.
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </EditForm>
 </div>
 
 
 @code {
-    RegisterAccountForm model = new RegisterAccountForm();
+    LoginDTO model = new LoginDTO();
     bool success;
+    bool isVisible = false;
 
-    public class RegisterAccountForm
+
+
+    private async Task OnValidSubmit(LoginDTO context)
     {
-        [Required]
-        [StringLength(8, ErrorMessage = "Name length can't be more than 8.")]
-        public string Username { get; set; }
+        isVisible = true;
+        var response = await UserManager.Login(context);
 
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        if (response.Success && response.Data != null)
+        {
+            var loginResult = JsonConvert.DeserializeObject<LoginResponse>(response.Data.ToString());
+            cookie.SetValue("authToken", loginResult.Token, 1);
 
-        [Required]
-        [StringLength(30, ErrorMessage = "Password must be at least 8 characters long.", MinimumLength = 8)]
-        public string Password { get; set; }
+            ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsAuthenticated(loginResult.Email);
 
-        [Required]
-        [Compare(nameof(Password))]
-        public string Password2 { get; set; }
+            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
 
+            NavigationManager.NavigateTo("/chat", true);
+        }
+        else
+        {
+            _snackBar.Add(response.Message, Severity.Error);
+        }
+        isVisible = false;
     }
 
-    private void OnValidSubmit(EditContext context)
+    protected override async Task OnInitializedAsync()
     {
-        success = true;
-        StateHasChanged();
+        var a = await UserManager.Accounts();
     }
 
 }

@@ -1,7 +1,6 @@
 ﻿using BlazorChat.Server.Data;
 using BlazorChat.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,11 +15,9 @@ namespace BlazorChat.Server.Controllers
     [Authorize]
     public class ChatController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
-        public ChatController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public ChatController(ApplicationDbContext context)
         {
-            _userManager = userManager;
             _context = context;
         }
         [HttpGet("{contactId}")]

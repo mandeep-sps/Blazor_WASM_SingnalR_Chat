@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject NavigationManager Navigation
-@inject SignOutSessionStateManager SignOutManager
+
+
 <AuthorizeView>
     <Authorized>
         <div style="margin-left:30px;">
@@ -27,7 +27,13 @@
 @code {
     private async Task BeginSignOut(MouseEventArgs args)
     {
-        await SignOutManager.SetSignOutState();
-        Navigation.NavigateTo("authentication/logout");
+        //var res = await DialogService.Confirm(" Are you sure you want to Logout?", "Sign out", new ConfirmOptions() { OkButtonText = "Yes, Signout", Style = "min-height:auto;min-width:auto;width:auto", CancelButtonText = "No" });
+        //if (res == true)
+        //{
+        await cookie.SetValue("authToken", "", -1);
+        ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
+        HttpClient.DefaultRequestHeaders.Authorization = null;
+        NavigationManager.NavigateTo("/");
+        //}
     }
 }

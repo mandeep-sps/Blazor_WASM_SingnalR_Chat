@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace BlazorChat.Shared
@@ -14,7 +13,7 @@ namespace BlazorChat.Shared
             ChatMessagesToUsers = new HashSet<ChatMessage>();
         }
 
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string Name { get; set; }
 

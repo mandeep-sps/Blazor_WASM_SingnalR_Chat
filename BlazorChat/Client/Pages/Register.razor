@@ -1,7 +1,10 @@
 ﻿@page "/register"
-
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+
+<MudOverlay LightBackground=true Visible="isVisible" Absolute="true">
+    <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+</MudOverlay>
 
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12" sm="5">
@@ -11,25 +14,26 @@
                     <MudText Typo="Typo.h5" Align="Align.Center">Signup</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" Label="Name" HelperText="Enter your name" Required="true" RequiredError="Name is required!" />
-                <MudTextField T="string" Label="Email" HelperText="Enter your email" Required="true" RequiredError="Email is required!"
+            <MudForm Model="@ApplicationUser" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" @bind-Value="ApplicationUser.Name" Label="Name" HelperText="Enter your name" Required="true" RequiredError="Name is required!" />
+                <MudTextField T="string" Label="Email" @bind-Value="ApplicationUser.Email" HelperText="Enter your email" Required="true" RequiredError="Email is required!"
                               Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-                <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="pwField1"
+                <MudTextField T="string" Label="Password" @bind-Value="ApplicationUser.Password" HelperText="Choose a strong password" @ref="pwField1"
                               InputType="InputType.Password"
                               Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
                               RequiredError="Password is required!" />
                 <MudTextField T="string"
-                              Label="Confirm Password" HelperText="Repeat the password" InputType="InputType.Password"
-                              Validation="@(new Func<string, string>(PasswordMatch))" />
+                              Label="Confirm Password" @bind-Value="ApplicationUser.RepeatPassword" HelperText="Repeat the password" InputType="InputType.Password"
+                              Validation="@(new Func<string, string>(PasswordMatch))" Required="true"
+                              RequiredError="Confirm Password is required!"/>
                 <div class="d-flex align-center justify-space-between mt-6">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.Save" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="(()=>Submit(ApplicationUser))" EndIcon="@Icons.Material.Filled.Save" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
         <MudPaper Class="pa-4 mt-4" Elevation="25">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>form.Validate())">Validate</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.Reset())" Class="mx-2">Reset</MudButton>            
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.Reset())" Class="mx-2">Reset</MudButton>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="3">
@@ -53,9 +57,8 @@
     </MudItem>
 </MudGrid>
 
-
 @code {
-    bool success;
+    bool success = false;
     string[] errors = { };
     MudTextField<string> pwField1;
     MudForm form;
@@ -84,4 +87,26 @@
         return null;
     }
 
+
+    private ApplicationUserRequest ApplicationUser = new();
+    bool isVisible = false;
+
+    async Task Submit(ApplicationUserRequest arg)
+    {
+        isVisible = true;
+
+        var response = await UserManager.Signup(arg);
+
+        if (response.Success)
+        {
+            _snackBar.Add(response.Message, Severity.Success);
+            form.Reset();
+        }
+        else
+        {
+            _snackBar.Add(response.Message, Severity.Error);
+        }
+
+        isVisible = false;
+    }
 }
