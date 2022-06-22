@@ -29,10 +29,7 @@
     </NotAuthorized>
 </AuthorizeView>
 @code {
-    private async Task ViewProfile(string Id)
-    {
 
-    }
     private async Task BeginSignOut(MouseEventArgs args)
     {
         var parameters = new DialogParameters();
@@ -41,8 +38,8 @@
         parameters.Add("Color", Color.Error);
 
         var result = Dialog.Show<ConfirmDialog>("Confirm", parameters, new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
-
-        if (await result.GetReturnValueAsync<bool>())
+        var res = await result.GetReturnValueAsync<bool?>();
+        if (Convert.ToBoolean(res))
         {
             await cookie.SetValue("authToken", "", -1);
             ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();

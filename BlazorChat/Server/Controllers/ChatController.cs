@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BlazorChat.Server.Controllers
@@ -44,17 +43,9 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            try
-            {
-                var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
-                var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).ToListAsync();
-                return Ok(allUsers);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).ToListAsync();
+            return Ok(allUsers);
         }
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
