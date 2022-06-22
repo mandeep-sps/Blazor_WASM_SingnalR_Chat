@@ -11,8 +11,7 @@
             Blazor Chat
         </MudText>
         <LoginDisplay />
-    </MudAppBar>
-
+    </MudAppBar>   
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             <CascadingValue Value="hubConnection">
@@ -58,6 +57,6 @@
         });
         var state = await _stateProvider.GetAuthenticationStateAsync();
         var user = state.User;
-        CurrentUserId = user.Claims.Where(a => a.Type == "sub").Select(a => a.Value).FirstOrDefault();
+        CurrentUserId = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
     }
 }

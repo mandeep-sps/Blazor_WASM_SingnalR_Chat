@@ -1,9 +1,11 @@
 ﻿using BlazorChat.Shared;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +17,16 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string CurrentMessage { get; set; }
         [Parameter] public string CurrentUserId { get; set; }
         [Parameter] public string CurrentUserEmail { get; set; }
+        [Parameter] public string CurrentUserName { get; set; }
+        public bool IsSendDisabled { get; set; } = true;
+
+        MudBlazor.MudButton SendButton;
+
         private List<ChatMessage> messages = new List<ChatMessage>();
+
+        [CascadingParameter]
+        public Task<AuthenticationState> AuthStat { get; set; }
+
         private async Task SubmitAsync()
         {
             if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId))
@@ -40,6 +51,9 @@ namespace BlazorChat.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
+            var state = await ((ApiAuthenticationStateProvider)_stateProvider).GetAuthenticationStateAsync();
+            var user = state.User;
+
             if (hubConnection == null)
             {
                 hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub")).Build();
@@ -55,22 +69,24 @@ namespace BlazorChat.Client.Pages
 
                     if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail, Name = CurrentUserName } });
                         await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                     }
                     else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = ContactEmail } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = ContactEmail, Name = ContactName } });
                     }
                     await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
                     StateHasChanged();
                 }
             });
+
             await GetUsersAsync();
-            var state = await _stateProvider.GetAuthenticationStateAsync();
-            var user = state.User;
-            CurrentUserId = user.Claims.Where(a => a.Type == "sub").Select(a => a.Value).FirstOrDefault();
-            CurrentUserEmail = user.Claims.Where(a => a.Type == "name").Select(a => a.Value).FirstOrDefault();
+
+
+            CurrentUserId = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            CurrentUserEmail = user.Claims.Where(a => a.Type == "Email").Select(a => a.Value).FirstOrDefault();
+            CurrentUserName = user.Claims.Where(a => a.Type == "Name").Select(a => a.Value).FirstOrDefault();
             if (!string.IsNullOrEmpty(ContactId))
             {
                 await LoadUserChat(ContactId);
@@ -78,12 +94,14 @@ namespace BlazorChat.Client.Pages
         }
         public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
         [Parameter] public string ContactEmail { get; set; }
+        [Parameter] public string ContactName { get; set; }
         [Parameter] public string ContactId { get; set; }
         async Task LoadUserChat(string userId)
         {
             var contact = await _chatManager.GetUserDetailsAsync(userId);
             ContactId = contact.Id;
             ContactEmail = contact.Email;
+            ContactName = contact.Name;
             _navigationManager.NavigateTo($"chat/{ContactId}");
             messages = new List<ChatMessage>();
             messages = await _chatManager.GetConversationAsync(ContactId);
@@ -92,5 +110,11 @@ namespace BlazorChat.Client.Pages
         {
             ChatUsers = await _chatManager.GetUsersAsync();
         }
+
+        private void OnInput(string value)
+        {
+
+        }
+
     }
 }

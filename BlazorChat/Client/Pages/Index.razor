@@ -45,7 +45,27 @@
     bool success;
     bool isVisible = false;
 
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthStat { get; set; }
 
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        var state = await ((ApiAuthenticationStateProvider)_stateProvider).GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo($"/chat");
+        }
+        else
+        {
+            await cookie.SetValue("authToken", "", -1);
+            ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
+            HttpClient.DefaultRequestHeaders.Authorization = null;
+        }
+    }
 
     private async Task OnValidSubmit(LoginDTO context)
     {
@@ -68,11 +88,6 @@
             _snackBar.Add(response.Message, Severity.Error);
         }
         isVisible = false;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var a = await UserManager.Accounts();
     }
 
 }

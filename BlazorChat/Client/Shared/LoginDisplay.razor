@@ -1,22 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-
+@inject MainLayout Layout
 
 <AuthorizeView>
     <Authorized>
+        @{
+            var email = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Email")?.Value;
+            var name = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Name")?.Value;
+            var Id = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Id")?.Value;
+        }
         <div style="margin-left:30px;">
             <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Chat"> Chat</MudButton>
         </div>
         <MudSpacer />
         <div class="pa-4 justify-center my-4 mud-text-align-center">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2" Link="authentication/profile">Hi, @context.User.Identity.Name! </MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Filled.Logout" OnClick="BeginSignOut">Log Out</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">
+                Hi, @(!string.IsNullOrEmpty(name) ? name : email) !
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" EndIcon="@Icons.Filled.Logout" OnClick="BeginSignOut">Log Out</MudButton>
         </div>
     </Authorized>
     <NotAuthorized>
-        <div style="margin-left:30px;">
-            <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Dashboard"> Chat</MudButton>
-        </div>
         <MudSpacer />
         <div class="pa-4 justify-center my-4 mud-text-align-center">
             <MudButton Variant="Variant.Filled" Class="mr-2" Color="Color.Primary" EndIcon="@Icons.Filled.PersonAddAlt1" Link="/register">Register</MudButton>
@@ -25,15 +29,25 @@
     </NotAuthorized>
 </AuthorizeView>
 @code {
+    private async Task ViewProfile(string Id)
+    {
+
+    }
     private async Task BeginSignOut(MouseEventArgs args)
     {
-        //var res = await DialogService.Confirm(" Are you sure you want to Logout?", "Sign out", new ConfirmOptions() { OkButtonText = "Yes, Signout", Style = "min-height:auto;min-width:auto;width:auto", CancelButtonText = "No" });
-        //if (res == true)
-        //{
-        await cookie.SetValue("authToken", "", -1);
-        ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
-        HttpClient.DefaultRequestHeaders.Authorization = null;
-        NavigationManager.NavigateTo("/");
-        //}
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Are you sure you want to sign out?");
+        parameters.Add("ButtonText", "Yes");
+        parameters.Add("Color", Color.Error);
+
+        var result = Dialog.Show<ConfirmDialog>("Confirm", parameters, new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+
+        if (await result.GetReturnValueAsync<bool>())
+        {
+            await cookie.SetValue("authToken", "", -1);
+            ((ApiAuthenticationStateProvider)_stateProvider).MarkUserAsLoggedOut();
+            HttpClient.DefaultRequestHeaders.Authorization = null;
+            NavigationManager.NavigateTo("/");
+        }
     }
 }

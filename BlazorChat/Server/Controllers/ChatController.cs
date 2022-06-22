@@ -23,7 +23,7 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("{contactId}")]
         public async Task<IActionResult> GetConversationAsync(string contactId)
         {
-            var userId = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).Select(a => a.Value).FirstOrDefault();
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             var messages = await _context.ChatMessages
                     .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId))
                     .OrderBy(a => a.CreatedDate)
@@ -44,9 +44,17 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("users")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            var userId = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).Select(a => a.Value).FirstOrDefault();
-            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).ToListAsync();
-            return Ok(allUsers);
+            try
+            {
+                var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+                var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).ToListAsync();
+                return Ok(allUsers);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
@@ -57,7 +65,7 @@ namespace BlazorChat.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveMessageAsync(ChatMessage message)
         {
-            var userId = User.Claims.Where(a => a.Type == ClaimTypes.NameIdentifier).Select(a => a.Value).FirstOrDefault();
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             message.FromUserId = userId;
             message.CreatedDate = DateTime.Now;
             message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();

@@ -2,6 +2,7 @@
 using BlazorApp.Client;
 using BlazorChat.Client;
 using BlazorChat.Client.Managers;
+using BlazorChat.Client.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,7 @@ builder.Services.AddApiAuthorization();
 builder.Services.AddTransient<IChatManager, ChatManager>();
 builder.Services.AddTransient<IUserManager, UserManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
+builder.Services.AddScoped<MainLayout>();
 
 builder.Services.AddScoped<ICookie, Cookie>();
 await builder.Build().RunAsync();
