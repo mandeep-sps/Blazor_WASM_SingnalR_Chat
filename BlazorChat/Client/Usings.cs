@@ -1,0 +1,11 @@
+﻿global using BlazorApp.Client;
+global using BlazorChat.Client;
+global using BlazorChat.Client.Managers;
+global using BlazorChat.Client.Shared;
+global using Microsoft.AspNetCore.Components.Authorization;
+global using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+global using Microsoft.Extensions.DependencyInjection;
+global using MudBlazor;
+global using MudBlazor.Services;
+global using System;
+global using System.Net.Http;

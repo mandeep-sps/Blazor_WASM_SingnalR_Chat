@@ -1,16 +1,4 @@
 
-using BlazorApp.Client;
-using BlazorChat.Client;
-using BlazorChat.Client.Managers;
-using BlazorChat.Client.Shared;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using MudBlazor;
-using MudBlazor.Services;
-using System;
-using System.Net.Http;
-
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 

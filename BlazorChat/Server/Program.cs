@@ -27,4 +27,4 @@ var app = builder.Build();
 app.UseResponseCompression();
 startup.Configure(app, app.Environment);
 
-app.Run();
+await app.RunAsync();
