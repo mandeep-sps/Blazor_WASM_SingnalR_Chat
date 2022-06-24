@@ -56,9 +56,10 @@ namespace BlazorChat.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveMessageAsync(ChatMessage message)
         {
+            var now = DateTime.Now;
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             message.FromUserId = userId;
-            message.CreatedDate = DateTime.Now;
+            message.CreatedDate = now;
             message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();
             await _context.ChatMessages.AddAsync(message);
             return Ok(await _context.SaveChangesAsync());

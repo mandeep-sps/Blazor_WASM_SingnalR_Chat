@@ -74,7 +74,6 @@
         {
             <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="">
                 <MudTextField T="string" Placeholder="Enter your message..." @bind-Value=CurrentMessage Immediate=true OnKeyUp="((args)=>Enter(args))" Class="mt-n2 mx-4" />
-                @*<input placeholder="Enter your message..." class="form-control mt-n2 mx-4 mud-input-slot mud-input-root mud-input-root-text" style="width:100%" value="@CurrentMessage" @oninput="((args)=>OnInput(args.Value.ToString()))" @onkeypress="((args)=>Enter(args))" />*@
                 <MudButton Disabled="IsSendDisabled" StartIcon="@Icons.Material.Outlined.Send" Color="Color.Secondary" ButtonType="ButtonType.Button" OnClick="SubmitAsync">Send</MudButton>
             </MudPaper>
         }

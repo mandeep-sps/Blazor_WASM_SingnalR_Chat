@@ -1,21 +1,17 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject IUserManager UserManager
-
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <AuthorizeView>
     <Authorized>
-        <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
-
         <div style="margin-left:30px;">
             <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Chat"> Chat</MudButton>
         </div>
-        <MudSpacer />
-        <div class="pa-4 justify-center my-4 mud-text-align-center">
-            <span class="@collapse">
-                <MudTooltip Text="@title">
-                    <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
-                </MudTooltip>
-            </span>
+        @*<MudSpacer />*@
+        <div class="pa-4 justify-center my-4 mud-text-align-center ml-auto">
+            <MudTooltip Text="@title">
+                <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
+            </MudTooltip>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">
                 Hi, @(!string.IsNullOrEmpty(Name) ? Name: Email)
             </MudButton>
@@ -23,8 +19,11 @@
         </div>
     </Authorized>
     <NotAuthorized>
-        <MudSpacer />
-        <div class="pa-4 justify-center my-4 mud-text-align-center">
+        @*<MudSpacer />       *@
+        <div class="pa-4 justify-center my-4 mud-text-align-center ml-auto">
+            <MudTooltip Text="@title">
+                <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
+            </MudTooltip>
             <MudButton Variant="Variant.Filled" Class="mr-2" Color="Color.Primary" EndIcon="@Icons.Filled.PersonAddAlt1" Link="/register">Register</MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" EndIcon="@Icons.Filled.Login" Link="/">Log in</MudButton>
         </div>
@@ -32,11 +31,11 @@
 </AuthorizeView>
 @code {
     public string MudIcon { get; set; }
-    public bool IsDark { get; set; }
+    public bool IsDark { get; set; } = false;
     public string Email { get; set; }
     public string Name { get; set; }
     public string Id { get; set; }
-    public string collapse { get; set; } = "collapse";
+    public bool collapse { get; set; } = false;
     public string title { get; set; }
     private MudTheme _theme = new();
     private bool _isDarkMode = false;
@@ -80,18 +79,34 @@
                     MudIcon = res.IsDark ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
                     title = res.IsDark ? " Switch to Light Mode" : " Switch to Dark Mode";
                     _isDarkMode = IsDark;
-                    collapse = "";
+                    collapse = true;
                 }
             }
+        }
+        else
+        {
+            MudIcon = IsDark ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
+            title = IsDark ? " Switch to Light Mode" : " Switch to Dark Mode";
+            _isDarkMode = IsDark;
         }
     }
     public async Task ChangeTheme(bool isDark)
     {
         var value = isDark ? false : true;
-        var response = await UserManager.UpdateTheme(Id, value);
-        if (response.Success && response.Data != null)
+        if (!string.IsNullOrEmpty(Id))
         {
-            IsDark = response.Data;
+            var response = await UserManager.UpdateTheme(Id, value);
+            if (response.Success && response.Data != null)
+            {
+                IsDark = response.Data;
+                MudIcon = value ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
+                title = value ? " Switch to Light Mode" : " Switch to Dark Mode";
+                _isDarkMode = value;
+            }
+        }
+        else
+        {
+            IsDark = value;
             MudIcon = value ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
             title = value ? " Switch to Light Mode" : " Switch to Dark Mode";
             _isDarkMode = value;

@@ -69,12 +69,12 @@ namespace BlazorChat.Client.Pages
 
                     if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUserId = CurrentUserId, FromUser = new ApplicationUser() { Id = CurrentUserId, Email = CurrentUserEmail, Name = CurrentUserName } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate.AddHours(5).AddMinutes(30), FromUserId = CurrentUserId, FromUser = new ApplicationUser() { Id = CurrentUserId, Email = CurrentUserEmail, Name = CurrentUserName } });
                         await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                     }
                     else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Id = ContactId, Email = ContactEmail, Name = ContactName } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate.AddHours(5).AddMinutes(30), FromUser = new ApplicationUser() { Id = ContactId, Email = ContactEmail, Name = ContactName } });
                     }
                     await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
                     StateHasChanged();
