@@ -14,10 +14,12 @@
     transition: .3scubic-bezier(.25,.8,.5,1) !important;
     white-space: nowrap !important;
 }
+
     .mud-badge.mud-badge-top.right {
         background-color: lightskyblue !important;
         inset: auto auto calc(100% - 18px) calc(100% - 18px) !important;
     }
+
     .mud-badge.mud-badge-top.right {
         background-color: lightskyblue;
     }

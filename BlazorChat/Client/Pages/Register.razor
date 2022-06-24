@@ -15,17 +15,27 @@
                 </CardHeaderContent>
             </MudCardHeader>
             <MudForm Model="@ApplicationUser" @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-                <MudTextField T="string" @bind-Value="ApplicationUser.Name" Label="Name" HelperText="Enter your name" Required="true" RequiredError="Name is required!" />
-                <MudTextField T="string" Label="Email" @bind-Value="ApplicationUser.Email" HelperText="Enter your email" Required="true" RequiredError="Email is required!"
+                <MudTextField T="string" @bind-Value="ApplicationUser.Name"
+                              Label="Name" HelperText="Enter your name"
+                              Required="true" RequiredError="Name is required!" />
+
+                <MudTextField T="string" Label="Email" @bind-Value="ApplicationUser.Email"
+                              HelperText="Enter your email"
+                              Required="true" RequiredError="Email is required!"
                               Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-                <MudTextField T="string" Label="Password" @bind-Value="ApplicationUser.Password" HelperText="Choose a strong password" @ref="pwField1"
+
+                <MudTextField T="string" Label="Password" @bind-Value="ApplicationUser.Password"
+                              HelperText="Choose a strong password" @ref="pwField1"
                               InputType="InputType.Password"
                               Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
                               RequiredError="Password is required!" />
+
                 <MudTextField T="string"
-                              Label="Confirm Password" @bind-Value="ApplicationUser.RepeatPassword" HelperText="Repeat the password" InputType="InputType.Password"
+                              Label="Confirm Password" @bind-Value="ApplicationUser.RepeatPassword"
+                              HelperText="Repeat the password" InputType="InputType.Password"
                               Validation="@(new Func<string, string>(PasswordMatch))" Required="true"
-                              RequiredError="Confirm Password is required!"/>
+                              RequiredError="Confirm Password is required!" />
+
                 <div class="d-flex align-center justify-space-between mt-6">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="(()=>Submit(ApplicationUser))" EndIcon="@Icons.Material.Filled.Save" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
                 </div>
