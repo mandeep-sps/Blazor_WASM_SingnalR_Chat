@@ -1,6 +1,5 @@
 ﻿using BlazorChat.Shared;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace BlazorChat.Client

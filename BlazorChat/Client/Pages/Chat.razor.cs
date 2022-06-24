@@ -1,9 +1,8 @@
 ﻿using BlazorChat.Shared;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +18,6 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string CurrentUserName { get; set; }
         public bool IsSendDisabled { get; set; } = true;
 
-        MudBlazor.MudButton SendButton;
 
         private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -42,6 +40,7 @@ namespace BlazorChat.Client.Pages
                 chatHistory.FromUserId = CurrentUserId;
                 await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
                 CurrentMessage = string.Empty;
+                IsSendDisabled = true;
             }
         }
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,12 +67,12 @@ namespace BlazorChat.Client.Pages
 
                     if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail, Name = CurrentUserName } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUserId = CurrentUserId, FromUser = new ApplicationUser() { Id = CurrentUserId, Email = CurrentUserEmail, Name = CurrentUserName } });
                         await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                     }
                     else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                     {
-                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = ContactEmail, Name = ContactName } });
+                        messages.Add(new ChatMessage { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Id = ContactId, Email = ContactEmail, Name = ContactName } });
                     }
                     await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
                     StateHasChanged();
@@ -95,7 +94,7 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string ContactEmail { get; set; }
         [Parameter] public string ContactName { get; set; }
         [Parameter] public string ContactId { get; set; }
-        async Task LoadUserChat(string userId)
+        public async Task LoadUserChat(string userId)
         {
             var contact = await _chatManager.GetUserDetailsAsync(userId);
             ContactId = contact.Id;
@@ -110,8 +109,15 @@ namespace BlazorChat.Client.Pages
             ChatUsers = await _chatManager.GetUsersAsync();
         }
 
-        private void OnInput(string value)
+
+        public async Task Enter(KeyboardEventArgs e)
         {
+            IsSendDisabled = string.IsNullOrEmpty(CurrentMessage) ? true : false;
+
+            if ((e.Code == "Enter" || e.Code == "NumpadEnter") && !string.IsNullOrEmpty(CurrentMessage))
+            {
+                await SubmitAsync();
+            }
 
         }
 

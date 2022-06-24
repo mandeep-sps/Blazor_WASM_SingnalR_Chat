@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@using BlazorChat.Client.Pages
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavigationManager
+
 <audio id="notification" src="/media/notification.mp3" />
 <MudThemeProvider />
 <MudDialogProvider />
@@ -11,7 +13,7 @@
             Blazor Chat
         </MudText>
         <LoginDisplay />
-    </MudAppBar>   
+    </MudAppBar>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             <CascadingValue Value="hubConnection">
@@ -49,7 +51,7 @@
                                     config.ActionColor = Color.Info;
                                     config.Onclick = snackbar =>
                             {
-                                _navigationManager.NavigateTo($"chat/{senderUserId}");
+                                _navigationManager.NavigateTo($"chat/{senderUserId}", true);
                                 return Task.CompletedTask;
                             };
                                 });

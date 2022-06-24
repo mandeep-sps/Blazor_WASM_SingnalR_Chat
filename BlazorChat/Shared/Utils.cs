@@ -8,7 +8,8 @@ namespace BlazorChat.Shared
     {
         public static string CreateHash()
         {
-            using var rng = RandomNumberGenerator.Create("System.Security.Cryptography.RandomNumberGenerator");
+
+            using var rng = RandomNumberGenerator.Create();
             byte[] buff = new byte[20];
             rng.GetBytes(buff);
             return Convert.ToBase64String(buff);
