@@ -54,7 +54,7 @@ namespace BlazorChat.Server.Service
         {
             try
             {
-                var data = await repository.FindBy<ApplicationUser>(x => x.Email == login.Email).FirstOrDefaultAsync();
+                var data = await repository.FindBy<ApplicationUser>(x => x.Email == login.Email).AsNoTracking().FirstOrDefaultAsync();
 
                 if (data != null)
                 {

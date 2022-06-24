@@ -32,7 +32,7 @@ namespace BlazorChat
 
         public IQueryable<T> FindBy<T>(System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : class
         {
-            return dbContext.Set<T>().Where(predicate);
+            return dbContext.Set<T>().Where(predicate).AsNoTracking();
         }
 
 
