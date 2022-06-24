@@ -15,6 +15,7 @@ namespace BlazorChat.Shared
         public string Password { get; set; }
 
         public DateTime AuditedOn { get; set; }
+        public bool IsDark { get; set; }
     }
 
 

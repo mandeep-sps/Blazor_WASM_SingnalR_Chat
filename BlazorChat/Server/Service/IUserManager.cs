@@ -13,5 +13,6 @@ namespace BlazorChat.Server.Service
         Task<ServiceResult<List<ApplicationUserResponse>>> Accounts();
 
         Task<ServiceResult<ApplicationUserResponse>> UserInfo(string id);
+        Task<ServiceResult<bool>> UpdateTheme(string id, bool value);
     }
 }

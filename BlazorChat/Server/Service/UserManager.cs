@@ -110,6 +110,21 @@ namespace BlazorChat.Server.Service
             }
         }
 
+        public async Task<ServiceResult<bool>> UpdateTheme(string id, bool value)
+        {
+            try
+            {
+                var userInfo = await repository.FindBy<ApplicationUser>(x => x.Id == id).FirstOrDefaultAsync();
+                userInfo.IsDark = value;
+                await repository.UpdateAsync(userInfo);
+                return new ServiceResult<bool>(userInfo.IsDark, "Account has been created");
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<bool>(ex, ex.Message);
+            }
+        }
+
         /// <summary>
         /// Private Expression for Code repete
         /// </summary>
@@ -122,6 +137,8 @@ namespace BlazorChat.Server.Service
                 Id = x.Id,
                 Name = x.Name,
                 Password = x.Password,
+                AuditedOn = x.AuditedOn,
+                IsDark = x.IsDark
             };
         }
 

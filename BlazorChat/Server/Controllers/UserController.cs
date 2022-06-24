@@ -54,10 +54,22 @@ namespace BlazorChat.Server.Controllers
         }
 
         [Authorize]
-        [HttpPost("userinfo/{id}")]
+        [HttpGet("userinfo/{id}")]
         public async Task<IActionResult> UserInfo(string id)
         {
             var response = await _userManager.UserInfo(id);
+
+            var apiResponse = new ApiResponseModel(response.HasValidationError ?
+                System.Net.HttpStatusCode.Conflict : System.Net.HttpStatusCode.OK, response.Message,
+                response.Exception, response.Data);
+
+            return Json(apiResponse);
+        }
+
+        [HttpGet("update-theme/{id}")]
+        public async Task<IActionResult> UpdateTheme(string id, bool value)
+        {
+            var response = await _userManager.UpdateTheme(id, value);
 
             var apiResponse = new ApiResponseModel(response.HasValidationError ?
                 System.Net.HttpStatusCode.Conflict : System.Net.HttpStatusCode.OK, response.Message,

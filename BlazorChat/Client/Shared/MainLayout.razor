@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 
 <audio id="notification" src="/media/notification.mp3" />
+
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -11,7 +12,7 @@
     <MudAppBar Elevation="0">
         <MudText Typo="Typo.h6" Style="cursor:pointer" @onclick='(()=>NavigationManager.NavigateTo("/"))' Class="ml-4">
             Blazor Chat
-        </MudText>
+        </MudText>       
         <LoginDisplay />
     </MudAppBar>
     <MudMainContent>
@@ -23,14 +24,11 @@
     </MudMainContent>
 </MudLayout>
 @code {
-    bool _drawerOpen = false;
     private string CurrentUserId { get; set; }
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
     private HubConnection hubConnection;
     public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+
+
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub"))
@@ -61,4 +59,6 @@
         var user = state.User;
         CurrentUserId = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
     }
+
+   
 }

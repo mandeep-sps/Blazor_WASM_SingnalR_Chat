@@ -1,20 +1,23 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IUserManager UserManager
 
 <AuthorizeView>
     <Authorized>
-        @{
-            var email = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Email")?.Value;
-            var name = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Name")?.Value;
-            var Id = @context.User.Identities?.FirstOrDefault()?.Claims?.FirstOrDefault(x => x.Type == "Id")?.Value;
-        }
+        <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
+
         <div style="margin-left:30px;">
             <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Chat"> Chat</MudButton>
         </div>
         <MudSpacer />
         <div class="pa-4 justify-center my-4 mud-text-align-center">
+            <span class="@collapse">
+                <MudTooltip Text="@title">
+                    <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
+                </MudTooltip>
+            </span>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">
-                Hi, @(!string.IsNullOrEmpty(name) ? name : email) !
+                Hi, @(!string.IsNullOrEmpty(Name) ? Name: Email)
             </MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Error" EndIcon="@Icons.Filled.Logout" OnClick="BeginSignOut">Log Out</MudButton>
         </div>
@@ -28,6 +31,15 @@
     </NotAuthorized>
 </AuthorizeView>
 @code {
+    public string MudIcon { get; set; }
+    public bool IsDark { get; set; }
+    public string Email { get; set; }
+    public string Name { get; set; }
+    public string Id { get; set; }
+    public string collapse { get; set; } = "collapse";
+    public string title { get; set; }
+    private MudTheme _theme = new();
+    private bool _isDarkMode = false;
 
     private async Task BeginSignOut(MouseEventArgs args)
     {
@@ -46,4 +58,44 @@
             NavigationManager.NavigateTo("/");
         }
     }
-}
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await ((ApiAuthenticationStateProvider)_stateProvider).GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            Id = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            Name = user.Claims.Where(a => a.Type == "Name").Select(a => a.Value).FirstOrDefault();
+            Email = user.Claims.Where(a => a.Type == "Email").Select(a => a.Value).FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(Id))
+            {
+                var response = await UserManager.UserInfo(Id);
+                if (response.Success && response.Data != null)
+                {
+                    var res = JsonConvert.DeserializeObject<ApplicationUserResponse>(response.Data.ToString());
+                    IsDark = res.IsDark;
+                    MudIcon = res.IsDark ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
+                    title = res.IsDark ? " Switch to Light Mode" : " Switch to Dark Mode";
+                    _isDarkMode = IsDark;
+                    collapse = "";
+                }
+            }
+        }
+    }
+    public async Task ChangeTheme(bool isDark)
+    {
+        var value = isDark ? false : true;
+        var response = await UserManager.UpdateTheme(Id, value);
+        if (response.Success && response.Data != null)
+        {
+            IsDark = response.Data;
+            MudIcon = value ? Icons.Outlined.LightMode : Icons.Outlined.DarkMode;
+            title = value ? " Switch to Light Mode" : " Switch to Dark Mode";
+            _isDarkMode = value;
+        }
+    }
+
+    }

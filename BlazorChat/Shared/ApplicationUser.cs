@@ -23,6 +23,8 @@ namespace BlazorChat.Shared
 
         public string Hash { get; set; }
 
+        public bool IsDark { get; set; } = false;
+
         public DateTime AuditedOn { get; set; } = DateTime.Now;
 
     }

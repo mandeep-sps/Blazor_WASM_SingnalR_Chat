@@ -31,9 +31,16 @@ namespace BlazorChat.Client.Managers
 
         }
 
-        public Task<ApiResponseModel> UserInfo(int id)
+        public async Task<ApiResponseModel> UserInfo(string id)
         {
-            throw new System.NotImplementedException();
+            return await ResponseHandler.GetApiResponse
+                 (await httpClient.GetAsync($"api/user/userinfo/" + id));
+        }
+
+        public async Task<ApiResponseModel> UpdateTheme(string id, bool value)
+        {
+            return await ResponseHandler.GetApiResponse
+                 (await httpClient.GetAsync($"api/user/update-theme/" + id + "?value=" + value));
         }
     }
 }

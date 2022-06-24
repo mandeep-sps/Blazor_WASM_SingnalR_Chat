@@ -11,6 +11,8 @@ namespace BlazorChat.Client.Managers
 
         Task<ApiResponseModel> Accounts();
 
-        Task<ApiResponseModel> UserInfo(int id);
+        Task<ApiResponseModel> UserInfo(string id);
+
+        Task<ApiResponseModel> UpdateTheme(string id, bool value);
     }
 }

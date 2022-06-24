@@ -18,6 +18,7 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string CurrentUserName { get; set; }
         public bool IsSendDisabled { get; set; } = true;
 
+        bool isVisible = false;
 
         private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -49,6 +50,7 @@ namespace BlazorChat.Client.Pages
         }
         protected override async Task OnInitializedAsync()
         {
+            isVisible = true;
             var state = await ((ApiAuthenticationStateProvider)_stateProvider).GetAuthenticationStateAsync();
             var user = state.User;
 
@@ -89,6 +91,8 @@ namespace BlazorChat.Client.Pages
             {
                 await LoadUserChat(ContactId);
             }
+
+            isVisible = false;
         }
         public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
         [Parameter] public string ContactEmail { get; set; }
