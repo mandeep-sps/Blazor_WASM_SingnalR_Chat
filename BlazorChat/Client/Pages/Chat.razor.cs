@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
