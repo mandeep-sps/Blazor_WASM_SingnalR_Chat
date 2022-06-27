@@ -38,7 +38,7 @@ namespace BlazorChat.Server.Controllers
                         ToUserId = x.ToUserId,
                         ToUser = x.ToUser,
                         FromUser = x.FromUser
-                    }).ToListAsync();
+                    }).AsNoTracking().ToListAsync();
             return Ok(messages);
         }
         [HttpGet("users")]
@@ -46,7 +46,7 @@ namespace BlazorChat.Server.Controllers
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId)
-                .Include(i => i.ChatMessagesFromUsers).ToListAsync();
+                .Include(i => i.ChatMessagesFromUsers).AsNoTracking().ToListAsync();
 
             List<ApplicationUserResult> applicationUsers = allUsers.Select(x => new ApplicationUserResult
             {
@@ -66,7 +66,8 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
         {
-            var user = await _context.ApplicationUsers.Where(user => user.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.ApplicationUsers.Where(user => user.Id == userId)
+                .AsNoTracking().FirstOrDefaultAsync();
             return Ok(user);
         }
 
@@ -75,7 +76,7 @@ namespace BlazorChat.Server.Controllers
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             var messages = await _context.ChatMessages
-                    .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) && !h.IsRead).ToListAsync();
+                    .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) && !h.IsRead).AsNoTracking().ToListAsync();
 
             messages.ForEach(x => x.IsRead = true);
 
@@ -90,7 +91,7 @@ namespace BlazorChat.Server.Controllers
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             message.FromUserId = userId;
             message.CreatedDate = now;
-            message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();
+            message.ToUserId = message.ToUserId; //await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();
             await _context.ChatMessages.AddAsync(message);
             return Ok(await _context.SaveChangesAsync());
         }
