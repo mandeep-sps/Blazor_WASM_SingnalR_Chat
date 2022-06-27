@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,14 +45,42 @@ namespace BlazorChat.Server.Controllers
         public async Task<IActionResult> GetUsersAsync()
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
-            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).AsNoTracking().ToListAsync();
-            return Ok(allUsers);
+            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId)
+                .Include(i => i.ChatMessagesFromUsers).AsNoTracking().ToListAsync();
+
+            List<ApplicationUserResult> applicationUsers = allUsers.Select(x => new ApplicationUserResult
+            {
+                AuditedOn = x.AuditedOn,
+                Email = x.Email,
+                Hash = x.Hash,
+                Id = x.Id,
+                IsDark = x.IsDark,
+                Name = x.Name,
+                Password = x.Password,
+                UnreadCount = x.ChatMessagesFromUsers.Count(x => x.IsRead == false)
+            }).ToList();
+
+            return Ok(applicationUsers);
         }
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
         {
             var user = await _context.ApplicationUsers.Where(user => user.Id == userId).AsNoTracking().FirstOrDefaultAsync();
             return Ok(user);
+        }
+
+        [HttpGet("read/{contactId}")]
+        public async Task<IActionResult> ReadMessages(string contactId)
+        {
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            var messages = await _context.ChatMessages
+                    .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId)).AsNoTracking().ToListAsync();
+
+            messages.ForEach(x => x.IsRead = true);
+
+            _context.UpdateRange(messages);
+
+            return Ok(await _context.SaveChangesAsync());
         }
         [HttpPost]
         public async Task<IActionResult> SaveMessageAsync(ChatMessage message)

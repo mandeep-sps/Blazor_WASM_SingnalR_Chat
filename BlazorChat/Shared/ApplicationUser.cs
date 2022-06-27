@@ -28,4 +28,9 @@ namespace BlazorChat.Shared
         public DateTime AuditedOn { get; set; } = DateTime.Now;
 
     }
+
+    public class ApplicationUserResult: ApplicationUser
+    {
+        public int UnreadCount { get; set; }
+    }
 }

@@ -6,9 +6,12 @@ namespace BlazorChat.Client.Managers
 {
     public interface IChatManager
     {
-        Task<List<ApplicationUser>> GetUsersAsync();
+        Task<List<ApplicationUserResult>> GetUsersAsync();
         Task SaveMessageAsync(ChatMessage message);
         Task<List<ChatMessage>> GetConversationAsync(string contactId);
         Task<ApplicationUser> GetUserDetailsAsync(string userId);
+        Task<bool> ReadAllMessages(string contactId);
+
+        Task<string> GetUsersAsync1();
     }
 }

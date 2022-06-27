@@ -1,4 +1,5 @@
 ﻿using BlazorChat.Shared;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -21,14 +22,25 @@ namespace BlazorChat.Client.Managers
         {
             return await _httpClient.GetFromJsonAsync<ApplicationUser>($"api/chat/users/{userId}");
         }
-        public async Task<List<ApplicationUser>> GetUsersAsync()
+        public async Task<List<ApplicationUserResult>> GetUsersAsync()
         {
-            var data = await _httpClient.GetFromJsonAsync<List<ApplicationUser>>("api/chat/users");
+            var response = await _httpClient.GetFromJsonAsync<List<ApplicationUserResult>>("api/chat/users");
+            return response;
+        }
+        public async Task<string> GetUsersAsync1()
+        {
+            var response = await _httpClient.GetAsync("api/chat/users");
+            var data = response.ToString();
             return data;
         }
         public async Task SaveMessageAsync(ChatMessage message)
         {
             await _httpClient.PostAsJsonAsync("api/chat", message);
+        }
+
+        public async Task<bool> ReadAllMessages(string contactId)
+        {
+            return await _httpClient.GetFromJsonAsync<bool>($"api/read/{contactId}");
         }
     }
 }

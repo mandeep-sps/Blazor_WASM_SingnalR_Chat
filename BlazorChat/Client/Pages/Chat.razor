@@ -4,14 +4,12 @@
 @attribute [Authorize]
 
 <style>
-    .mud-badge {
-        display: none;
-    }
 
-        .mud-badge.mud-badge-top.right {
-            background-color: lightskyblue !important;
-            inset: auto auto calc(100% - 18px) calc(100% - 18px) !important;
-        }
+
+    .mud-badge.mud-badge-top.right {
+        background-color: lightskyblue !important;
+        inset: auto auto calc(100% - 18px) calc(100% - 18px) !important;
+    }
 
     .mud-list-item.mud-list-item-gutters.mud-list-item-clickable.mud-ripple.pa-0.px-2.selectedChat {
         background-color: var(--mud-palette-background-grey);
@@ -95,7 +93,7 @@
                         <MudListItem Class="pa-0 px-2 selectedChat" OnClick="@(() => LoadUserChat(user.Id))">
                             <div class="d-flex flex-row mt-n1 mb-n1 ">
                                 <div class="mr-4">
-                                    <MudBadge Class="my-2">
+                                    <MudBadge Class="badge-pr mx-6 my-4" Visible=false>
                                         <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
                                     </MudBadge>
                                 </div>
@@ -103,26 +101,39 @@
                                     <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
                                     <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
                                 </div>
-                            </div>
+                            </div>                           
                         </MudListItem>
                     }
                     else
                     {
+
                         <MudListItem Class="pa-0 px-2 " OnClick="@(() => LoadUserChat(user.Id))">
                             <div class="d-flex flex-row mt-n1 mb-n1">
                                 <div class="mr-4">
-                                    <MudBadge Class="my-2">
-                                        <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
-                                    </MudBadge>
+
+                                    @if (user.UnreadCount > 0)
+                                    {
+                                        <MudBadge Content="user.UnreadCount" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
+                                            <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
+                                        </MudBadge>
+                                    }
+                                    else
+                                    {
+                                        <MudBadge Class="mx-6 my-4" Visible=false>
+                                            <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
+                                        </MudBadge>
+                                    }
                                 </div>
                                 <div>
                                     <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
                                     <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
+                                    <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@abc</MudText>
                                 </div>
                             </div>
                         </MudListItem>
                     }
                 }
+                <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@abc</MudText>
             </MudList>
         </div>
     </MudPaper>

@@ -94,10 +94,11 @@ namespace BlazorChat.Client.Pages
 
             isVisible = false;
         }
-        public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
+        public List<ApplicationUserResult> ChatUsers = new List<ApplicationUserResult>();
         [Parameter] public string ContactEmail { get; set; }
         [Parameter] public string ContactName { get; set; }
         [Parameter] public string ContactId { get; set; }
+        public string abc { get; set; }
         public async Task LoadUserChat(string userId)
         {
             var contact = await _chatManager.GetUserDetailsAsync(userId);
@@ -105,6 +106,7 @@ namespace BlazorChat.Client.Pages
             ContactEmail = contact.Email;
             ContactName = contact.Name;
             _navigationManager.NavigateTo($"chat/{ContactId}");
+            await _chatManager.ReadAllMessages(ContactId);
             messages = new List<ChatMessage>();
             messages = await _chatManager.GetConversationAsync(ContactId);
         }
@@ -112,7 +114,6 @@ namespace BlazorChat.Client.Pages
         {
             ChatUsers = await _chatManager.GetUsersAsync();
         }
-
 
         public async Task Enter(KeyboardEventArgs e)
         {
