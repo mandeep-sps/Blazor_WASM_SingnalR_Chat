@@ -40,7 +40,8 @@ namespace BlazorChat.Client.Managers
 
         public async Task<bool> ReadAllMessages(string contactId)
         {
-            return await _httpClient.GetFromJsonAsync<bool>($"api/read/{contactId}");
+            var response = await _httpClient.GetAsync($"api/chat/read/{contactId}");
+            return response.IsSuccessStatusCode;
         }
     }
 }

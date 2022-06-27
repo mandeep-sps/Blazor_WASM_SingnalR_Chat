@@ -16,9 +16,11 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string CurrentUserId { get; set; }
         [Parameter] public string CurrentUserEmail { get; set; }
         [Parameter] public string CurrentUserName { get; set; }
+        public bool Theme { get; set; }
         public bool IsSendDisabled { get; set; } = true;
 
         bool isVisible = false;
+        bool isVisibleChat = false;
 
         private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -99,8 +101,10 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string ContactName { get; set; }
         [Parameter] public string ContactId { get; set; }
         public string abc { get; set; }
+
         public async Task LoadUserChat(string userId)
         {
+            isVisibleChat = true;
             var contact = await _chatManager.GetUserDetailsAsync(userId);
             ContactId = contact.Id;
             ContactEmail = contact.Email;
@@ -109,10 +113,16 @@ namespace BlazorChat.Client.Pages
             await _chatManager.ReadAllMessages(ContactId);
             messages = new List<ChatMessage>();
             messages = await _chatManager.GetConversationAsync(ContactId);
+            ChatUsers = await _chatManager.GetUsersAsync();
+            isVisibleChat = false;
         }
-        private async Task GetUsersAsync()
+        private async Task GetUsersAsync(bool stateChanged = false)
         {
             ChatUsers = await _chatManager.GetUsersAsync();
+            if (stateChanged)
+            {
+                StateHasChanged();
+            }
         }
 
         public async Task Enter(KeyboardEventArgs e)

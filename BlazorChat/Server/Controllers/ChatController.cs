@@ -38,7 +38,7 @@ namespace BlazorChat.Server.Controllers
                         ToUserId = x.ToUserId,
                         ToUser = x.ToUser,
                         FromUser = x.FromUser
-                    }).AsNoTracking().ToListAsync();
+                    }).ToListAsync();
             return Ok(messages);
         }
         [HttpGet("users")]
@@ -46,7 +46,7 @@ namespace BlazorChat.Server.Controllers
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId)
-                .Include(i => i.ChatMessagesFromUsers).AsNoTracking().ToListAsync();
+                .Include(i => i.ChatMessagesFromUsers).ToListAsync();
 
             List<ApplicationUserResult> applicationUsers = allUsers.Select(x => new ApplicationUserResult
             {
@@ -57,7 +57,8 @@ namespace BlazorChat.Server.Controllers
                 IsDark = x.IsDark,
                 Name = x.Name,
                 Password = x.Password,
-                UnreadCount = x.ChatMessagesFromUsers.Count(x => x.IsRead == false)
+                //UnreadCount = x.ChatMessagesFromUsers.Count(x => x.IsRead == false)
+                UnreadCount = x.ChatMessagesFromUsers.Count(h => (h.FromUserId == x.Id && h.ToUserId == userId) && (!h.IsRead))
             }).ToList();
 
             return Ok(applicationUsers);
@@ -65,7 +66,7 @@ namespace BlazorChat.Server.Controllers
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
         {
-            var user = await _context.ApplicationUsers.Where(user => user.Id == userId).AsNoTracking().FirstOrDefaultAsync();
+            var user = await _context.ApplicationUsers.Where(user => user.Id == userId).FirstOrDefaultAsync();
             return Ok(user);
         }
 
@@ -74,7 +75,7 @@ namespace BlazorChat.Server.Controllers
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             var messages = await _context.ChatMessages
-                    .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) || (h.FromUserId == userId && h.ToUserId == contactId)).AsNoTracking().ToListAsync();
+                    .Where(h => (h.FromUserId == contactId && h.ToUserId == userId) && !h.IsRead).ToListAsync();
 
             messages.ForEach(x => x.IsRead = true);
 
@@ -89,7 +90,7 @@ namespace BlazorChat.Server.Controllers
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             message.FromUserId = userId;
             message.CreatedDate = now;
-            message.ToUserId = message.ToUserId; //await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).AsNoTracking().FirstOrDefaultAsync();
+            message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();
             await _context.ChatMessages.AddAsync(message);
             return Ok(await _context.SaveChangesAsync());
         }

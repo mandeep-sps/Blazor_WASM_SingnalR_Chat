@@ -32,5 +32,6 @@ namespace BlazorChat.Shared
     public class ApplicationUserResult: ApplicationUser
     {
         public int UnreadCount { get; set; }
+        public DateTime? SenderDate { get; set; }
     }
 }
