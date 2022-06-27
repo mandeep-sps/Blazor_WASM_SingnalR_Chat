@@ -37,20 +37,20 @@ namespace BlazorChat.Server.Controllers
                         ToUserId = x.ToUserId,
                         ToUser = x.ToUser,
                         FromUser = x.FromUser
-                    }).ToListAsync();
+                    }).AsNoTracking().ToListAsync();
             return Ok(messages);
         }
         [HttpGet("users")]
         public async Task<IActionResult> GetUsersAsync()
         {
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
-            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).ToListAsync();
+            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId).AsNoTracking().ToListAsync();
             return Ok(allUsers);
         }
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
         {
-            var user = await _context.ApplicationUsers.Where(user => user.Id == userId).FirstOrDefaultAsync();
+            var user = await _context.ApplicationUsers.Where(user => user.Id == userId).AsNoTracking().FirstOrDefaultAsync();
             return Ok(user);
         }
         [HttpPost]
@@ -60,7 +60,7 @@ namespace BlazorChat.Server.Controllers
             var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             message.FromUserId = userId;
             message.CreatedDate = now;
-            message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).FirstOrDefaultAsync();
+            message.ToUser = await _context.ApplicationUsers.Where(user => user.Id == message.ToUserId).AsNoTracking().FirstOrDefaultAsync();
             await _context.ChatMessages.AddAsync(message);
             return Ok(await _context.SaveChangesAsync());
         }
