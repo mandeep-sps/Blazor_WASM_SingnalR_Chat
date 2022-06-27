@@ -57,11 +57,11 @@ namespace BlazorChat.Server.Controllers
                 IsDark = x.IsDark,
                 Name = x.Name,
                 Password = x.Password,
-                //UnreadCount = x.ChatMessagesFromUsers.Count(x => x.IsRead == false)
+                SenderDate = x.ChatMessagesFromUsers.Count > 0 ? x.ChatMessagesFromUsers.LastOrDefault().CreatedDate : null,
                 UnreadCount = x.ChatMessagesFromUsers.Count(h => (h.FromUserId == x.Id && h.ToUserId == userId) && (!h.IsRead))
             }).ToList();
 
-            return Ok(applicationUsers);
+            return Ok(applicationUsers.OrderByDescending(x => x.SenderDate).ToList());
         }
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
