@@ -21,6 +21,7 @@ namespace BlazorChat.Client.Pages
 
         bool isVisible = false;
         bool isVisibleChat = false;
+        bool isVisibleContact = false;
 
         private List<ChatMessage> messages = new List<ChatMessage>();
 
@@ -118,11 +119,13 @@ namespace BlazorChat.Client.Pages
         }
         private async Task GetUsersAsync(bool stateChanged = false)
         {
+            isVisibleContact = true;
             ChatUsers = await _chatManager.GetUsersAsync();
             if (stateChanged)
             {
                 StateHasChanged();
             }
+            isVisibleContact = false;
         }
 
         public async Task Enter(KeyboardEventArgs e)
