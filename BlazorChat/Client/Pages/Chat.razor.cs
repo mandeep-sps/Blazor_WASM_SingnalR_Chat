@@ -16,7 +16,7 @@ namespace BlazorChat.Client.Pages
         [Parameter] public string CurrentUserId { get; set; }
         [Parameter] public string CurrentUserEmail { get; set; }
         [Parameter] public string CurrentUserName { get; set; }
-        public bool Theme { get; set; }
+        public string Theme { get; set; }
         public bool IsSendDisabled { get; set; } = true;
 
         bool isVisible = false;
@@ -24,6 +24,8 @@ namespace BlazorChat.Client.Pages
         bool isVisibleContact = false;
 
         private List<ChatMessage> messages = new List<ChatMessage>();
+
+        public string SearchContact { get; set; }
 
         [CascadingParameter]
         public Task<AuthenticationState> AuthStat { get; set; }
@@ -82,7 +84,7 @@ namespace BlazorChat.Client.Pages
                     await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
                     StateHasChanged();
                 }
-            });
+            });           
 
             await GetUsersAsync();
 
@@ -90,6 +92,8 @@ namespace BlazorChat.Client.Pages
             CurrentUserId = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
             CurrentUserEmail = user.Claims.Where(a => a.Type == "Email").Select(a => a.Value).FirstOrDefault();
             CurrentUserName = user.Claims.Where(a => a.Type == "Name").Select(a => a.Value).FirstOrDefault();
+            Theme = user.Claims.Where(a => a.Type == "Theme").Select(a => a.Value).FirstOrDefault();
+
             if (!string.IsNullOrEmpty(ContactId))
             {
                 await LoadUserChat(ContactId);
@@ -98,6 +102,7 @@ namespace BlazorChat.Client.Pages
             isVisible = false;
         }
         public List<ApplicationUserResult> ChatUsers = new List<ApplicationUserResult>();
+        public List<ApplicationUserResult> ChatUsersList = new List<ApplicationUserResult>();
         [Parameter] public string ContactEmail { get; set; }
         [Parameter] public string ContactName { get; set; }
         [Parameter] public string ContactId { get; set; }
@@ -114,13 +119,15 @@ namespace BlazorChat.Client.Pages
             await _chatManager.ReadAllMessages(ContactId);
             messages = new List<ChatMessage>();
             messages = await _chatManager.GetConversationAsync(ContactId);
-            ChatUsers = await _chatManager.GetUsersAsync();
+            ChatUsersList = await _chatManager.GetUsersAsync();
+            ChatUsers = ChatUsersList;
             isVisibleChat = false;
         }
         private async Task GetUsersAsync(bool stateChanged = false)
         {
             isVisibleContact = true;
-            ChatUsers = await _chatManager.GetUsersAsync();
+            ChatUsersList = await _chatManager.GetUsersAsync();
+            ChatUsers = ChatUsersList;
             if (stateChanged)
             {
                 StateHasChanged();
@@ -137,6 +144,11 @@ namespace BlazorChat.Client.Pages
                 await SubmitAsync();
             }
 
+        }
+
+        public void OnSearchContact(string value)
+        {
+            ChatUsers = ChatUsersList.Where(x => x.Name.ToLower().Trim().StartsWith(value.ToLower().Trim())).ToList();
         }
 
     }

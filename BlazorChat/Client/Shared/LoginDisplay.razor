@@ -1,25 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject IUserManager UserManager
+
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <AuthorizeView>
     <Authorized>
         <div style="margin-left:30px;">
             <MudButton Href="/chat" Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.Chat"> Chat</MudButton>
         </div>
-        @*<MudSpacer />*@
         <div class="pa-4 justify-center my-4 mud-text-align-center ml-auto">
             <MudTooltip Text="@title">
                 <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
             </MudTooltip>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">
-                Hi, @(!string.IsNullOrEmpty(Name) ? Name: Email)
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: none;letter-spacing: 1.5px;" Class="mr-2 email">
+                Hi, @(!string.IsNullOrEmpty(Email) ? Email.ToLower(): Name)
             </MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Error" EndIcon="@Icons.Filled.Logout" OnClick="BeginSignOut">Log Out</MudButton>
+            <MudTooltip Text="Click to Sign out">
+                <MudIconButton Variant="Variant.Filled" Color="Color.Error" Icon="@Icons.Filled.Logout" OnClick="BeginSignOut"></MudIconButton>
+            </MudTooltip>
         </div>
     </Authorized>
     <NotAuthorized>
-        @*<MudSpacer />       *@
         <div class="pa-4 justify-center my-4 mud-text-align-center ml-auto">
             <MudTooltip Text="@title">
                 <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@MudIcon" OnClick="(()=>ChangeTheme(IsDark))" Class="mr-2" />
@@ -38,7 +39,7 @@
     public bool collapse { get; set; } = false;
     public string title { get; set; }
     private MudTheme _theme = new();
-    private bool _isDarkMode = false;
+    public bool _isDarkMode = false;
 
     private async Task BeginSignOut(MouseEventArgs args)
     {

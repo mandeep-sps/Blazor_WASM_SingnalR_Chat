@@ -1,8 +1,9 @@
 ﻿@page "/home"
 @page "/"
 @using System.Net.Http.Headers
+@inject LoginDisplay LoginDisplay 
 
-<MudOverlay LightBackground=true Visible="isVisible" Absolute="true">
+<MudOverlay DarkBackground=LoginDisplay._isDarkMode Visible="isVisible" Absolute="true">
     <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
 </MudOverlay>
 

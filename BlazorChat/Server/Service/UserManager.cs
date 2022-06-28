@@ -153,7 +153,8 @@ namespace BlazorChat.Server.Service
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("Id", userInfo.Id.ToString()),
                         new Claim("Email", userInfo.Email),
-                        new Claim("Name", userInfo.Name)
+                        new Claim("Name", userInfo.Name),
+                        new Claim("Theme", userInfo.IsDark.ToString())
                     };
             var token = new JwtSecurityToken(configuration["Jwt:Issuer"], configuration["Jwt:Issuer"],
                 claims, expires: DateTime.Now.AddHours(2), signingCredentials: credentials);

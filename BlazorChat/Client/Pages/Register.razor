@@ -1,8 +1,9 @@
 ﻿@page "/register"
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@inject LoginDisplay LoginDisplay 
 
-<MudOverlay LightBackground=true Visible="isVisible" Absolute="true">
+<MudOverlay DarkBackground=LoginDisplay._isDarkMode Visible="isVisible" Absolute="true">
     <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
 </MudOverlay>
 
@@ -111,6 +112,7 @@
         {
             _snackBar.Add(response.Message, Severity.Success);
             form.Reset();
+            NavigationManager.NavigateTo("/");
         }
         else
         {

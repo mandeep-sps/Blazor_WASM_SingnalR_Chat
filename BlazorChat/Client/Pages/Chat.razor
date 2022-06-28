@@ -18,13 +18,12 @@
 
 </style>
 
-<MudOverlay LightBackground=true Visible="isVisible" Absolute="true">
+<MudOverlay DarkBackground='(Theme=="True"?true:false)' Visible="isVisible" Absolute="true">
     <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
 </MudOverlay>
 
 <div class="d-flex flex-grow-1 flex-row">
     <MudPaper Elevation="25" Class="py-4 flex-grow-1">
-
         <MudToolBar Dense="true">
             @if (string.IsNullOrEmpty(ContactId))
             {
@@ -38,7 +37,7 @@
             }
         </MudToolBar>
         <div class="d-flex flex-column px-4" style="max-height:65vh;min-height:65vh; overflow:scroll;" id="chatContainer">
-            <MudOverlay LightBackground=true Style="height: 65vh; position: relative;" Visible="@isVisibleChat" Absolute="true">
+            <MudOverlay DarkBackground='(Theme=="True"?true:false)' Style="height: 65vh; position: relative;" Visible="@isVisibleChat" Absolute="true">
                 <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
             </MudOverlay>
             @foreach (var message in messages)
@@ -86,11 +85,14 @@
     <MudPaper Elevation="25" Class="pa-3 ml-6" MinWidth="350px">
         <MudToolBar Dense="true">
             <MudGrid>
-                <MudItem Class="d-flex align-center justify-start mud-width-full py-8" xs="6">
-                    <MudText Typo="Typo.h6" Inline="true" Class="mr-2">#</MudText>
+                <MudItem Class="d-flex align-center justify-start mud-width-full py-8" xs="4">
+                    <MudIcon Icon="@Icons.Material.Outlined.Person" Style="margin-right:10px"></MudIcon>
                     <MudText Typo="Typo.h6">Contacts</MudText>
                 </MudItem>
-                <MudItem Class="d-flex align-center justify-end mud-width-full py-8" xs="6">
+                <MudItem Class="d-flex align-center justify-start mud-width-full py-8" xs="6">
+                    <MudTextField T="string" Placeholder="Search..." @bind-Value=SearchContact Immediate=true OnKeyUp="(()=>OnSearchContact(SearchContact))" Class="mt-n2 mx-4" />
+                </MudItem>
+                <MudItem Class="d-flex align-center justify-end mud-width-full py-8" xs="2">
                     <MudTooltip Text="Click to refresh" Class="ml-auto">
                         <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Outlined.Refresh" OnClick="(()=>GetUsersAsync(true))" Class="mr-2" />
                     </MudTooltip>
@@ -98,58 +100,68 @@
             </MudGrid>
         </MudToolBar>
         <div class="d-flex flex-column px-4" style="max-height:70vh;min-height:70vh; overflow:scroll;">
-             <MudOverlay LightBackground=true Style="height: 70vh; position: relative;" Visible="@isVisibleContact" Absolute="true">
+            <MudOverlay DarkBackground='(Theme=="True"?true:false)' Style="height: 70vh; position: relative;" Visible="@isVisibleContact" Absolute="true">
                 <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
             </MudOverlay>
             <MudList Clickable="true">
-                @foreach (var user in ChatUsers)
+                @if (ChatUsers.Count > 0)
                 {
-                    @if (user.Id == ContactId)
+                    @foreach (var user in ChatUsers)
                     {
-                        <MudListItem Class="pa-0 px-2 selectedChat" OnClick="@(() => LoadUserChat(user.Id))">
-                            <div class="d-flex flex-row mt-n1 mb-n1 ">
-                                <div class="mr-4">
-                                    <MudBadge Class="badge-pr mx-6 my-4" Visible=false>
-                                        <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
-                                    </MudBadge>
-                                </div>
-                                <div>
-                                    <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
-                                    <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
-                                </div>
-                            </div>
-                        </MudListItem>
-                    }
-                    else
-                    {
-
-                        <MudListItem Class="pa-0 px-2 " OnClick="@(() => LoadUserChat(user.Id))">
-                            <div class="d-flex flex-row mt-n1 mb-n1">
-                                <div class="mr-4">
-
-                                    @if (user.UnreadCount > 0)
-                                    {
-                                        <MudBadge Content="user.UnreadCount" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
-                                            <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
+                        @if (user.Id == ContactId)
+                        {
+                            <MudListItem Class="pa-0 px-2 selectedChat" OnClick="@(() => LoadUserChat(user.Id))">
+                                <div class="d-flex flex-row mt-n1 mb-n1 ">
+                                    <div class="mr-4">
+                                        <MudBadge Class="badge-pr mx-6 my-4" Visible=false>
+                                            <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
                                         </MudBadge>
-                                    }
-                                    else
-                                    {
-                                        <MudBadge Class="mx-6 my-4" Visible=false>
-                                            <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
-                                        </MudBadge>
-                                    }
+                                    </div>
+                                    <div>
+                                        <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
+                                        <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
+                                    </div>
                                 </div>
-                                <div>
-                                    <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
-                                    <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
-                                    <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@abc</MudText>
+                            </MudListItem>
+                        }
+                        else
+                        {
+
+                            <MudListItem Class="pa-0 px-2 " OnClick="@(() => LoadUserChat(user.Id))">
+                                <div class="d-flex flex-row mt-n1 mb-n1">
+                                    <div class="mr-4">
+
+                                        @if (user.UnreadCount > 0)
+                                        {
+                                            <MudBadge Content="user.UnreadCount" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
+                                                <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
+                                            </MudBadge>
+                                        }
+                                        else
+                                        {
+                                            <MudBadge Class="mx-6 my-4" Visible=false>
+                                                <MudAvatar Color="Color.Primary" Style="height:50px; width:50px;">@user.Name.ToUpper().FirstOrDefault()</MudAvatar>
+                                            </MudBadge>
+                                        }
+                                    </div>
+                                    <div>
+                                        <MudText Typo="Typo.subtitle2" Class="mt-3 font-weight-bold">@user.Name</MudText>
+                                        <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@user.Email</MudText>
+                                        <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@abc</MudText>
+                                    </div>
                                 </div>
-                            </div>
-                        </MudListItem>
+                            </MudListItem>
+                        }
                     }
                 }
-                <MudText Typo="Typo.caption" Style="margin-top:10px;" Class="mb-n2">@abc</MudText>
+                else if (!isVisible)
+                {
+                    <MudGrid Justify="Justify.Center" Class="mt-10">
+
+                        <MudText Typo="Typo.caption" Style="margin-top:10px;" Align="Align.Center" Class="mb-n2">Sorry! No record found.</MudText>
+                    </MudGrid>
+                }
+             
             </MudList>
         </div>
     </MudPaper>

@@ -38,7 +38,7 @@
         {
             if (CurrentUserId == receiverUserId)
             {
-                _jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
+                //_jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
                 _snackBar.Add(message, Severity.Info, config =>
                                 {
                                     config.VisibleStateDuration = 10000;
