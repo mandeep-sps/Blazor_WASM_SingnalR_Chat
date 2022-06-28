@@ -4,6 +4,17 @@
 @inject NavigationManager NavigationManager
 
 <audio id="notification" src="/media/notification.mp3" />
+<style>
+    .footer{
+position: fixed;
+    height: 20px;
+    width: 99%;
+    margin: auto;
+    bottom: 0px;
+    text-align: center;
+    font-size:medium;
+}
+</style>
 
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -11,25 +22,33 @@
     <MudAppBar Elevation="0">
         <MudText Typo="Typo.h6" Style="cursor:pointer" @onclick='(()=>NavigationManager.NavigateTo("/"))' Class="ml-4">
             Blazor Chat
-        </MudText>       
+        </MudText>
         <LoginDisplay />
     </MudAppBar>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             <CascadingValue Value="hubConnection">
                 @Body
+                <hr />
+        <footer>
+            <p class="footer">&copy; @DateTime.Now.Year - SoftProdigy All rights reserved.</p>
+        </footer>
             </CascadingValue>
         </MudContainer>
     </MudMainContent>
+   
 </MudLayout>
 @code {
     private string CurrentUserId { get; set; }
     private HubConnection hubConnection;
     public bool IsConnected => hubConnection.State == HubConnectionState.Connected;
-
+    public string TrademarkMessage { get; set; } = 
+        "Doctor Who is a registered trademark of the BBC. " +
+        "https://www.doctorwho.tv/";
 
     protected override async Task OnInitializedAsync()
     {
+
         hubConnection = new HubConnectionBuilder().WithUrl(_navigationManager.ToAbsoluteUri("/signalRHub"))
         .WithAutomaticReconnect()
         .Build();
@@ -40,18 +59,18 @@
             {
                 //_jsRuntime.InvokeAsync<string>("PlayAudio", "notification");
                 _snackBar.Add(message, Severity.Info, config =>
+                                    {
+                                        config.VisibleStateDuration = 10000;
+                                        config.HideTransitionDuration = 500;
+                                        config.ShowTransitionDuration = 500;
+                                        config.Action = "Reply";
+                                        config.ActionColor = Color.Info;
+                                        config.Onclick = snackbar =>
                                 {
-                                    config.VisibleStateDuration = 10000;
-                                    config.HideTransitionDuration = 500;
-                                    config.ShowTransitionDuration = 500;
-                                    config.Action = "Reply";
-                                    config.ActionColor = Color.Info;
-                                    config.Onclick = snackbar =>
-                            {
-                                _navigationManager.NavigateTo($"chat/{senderUserId}", true);
-                                return Task.CompletedTask;
-                            };
-                                });
+                                    _navigationManager.NavigateTo($"chat/{senderUserId}", true);
+                                    return Task.CompletedTask;
+                                };
+                                    });
             }
         });
         var state = await _stateProvider.GetAuthenticationStateAsync();
@@ -59,5 +78,5 @@
         CurrentUserId = user.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
     }
 
-   
+
 }
