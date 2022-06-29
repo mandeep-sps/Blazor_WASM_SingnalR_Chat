@@ -89,14 +89,13 @@ l-32 60 -47 -20 c-91 -39 -192 -91 -192 -99 0 -36 65 -142 125 -204 184 -187
         <a class="dismiss">🗙</a>
     </div>
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
-
-    <script src="decode.min.js"></script>
+    <script type="module" src="decode.js"></script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="js/scroll.js"></script>
     <script src="js/sounds.js"></script>
     <script type="module">
-        import { BrotliDecode } from './decode.min.js';
+        import { BrotliDecode } from './decode.js';
         Blazor.start({
             loadBootResource: function (type, name, defaultUri, integrity) {
                 if (type !== 'dotnetjs' && location.hostname !== 'localhost') {
