@@ -88,6 +88,7 @@ namespace BlazorChat.Server
             }
 
             app.UseHttpsRedirection();
+            app.UseResponseCompression();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
 
