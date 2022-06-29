@@ -26,20 +26,25 @@ namespace BlazorChat.Client.Managers
             var response = await _httpClient.GetFromJsonAsync<List<ApplicationUserResult>>("api/chat/users");
             return response;
         }
-        public async Task<string> GetUsersAsync1()
+        public async Task<int> GetTotalUnreadCountAsync()
         {
-            var response = await _httpClient.GetAsync("api/chat/users");
-            var data = response.ToString();
-            return data;
+            var response = await _httpClient.GetFromJsonAsync<int>("api/chat/unread-count");
+            return response;
         }
         public async Task SaveMessageAsync(ChatMessage message)
         {
             await _httpClient.PostAsJsonAsync("api/chat", message);
         }
 
-        public async Task<bool> ReadAllMessages(string contactId)
+        public async Task<bool> ReadMessages(string contactId)
         {
             var response = await _httpClient.GetAsync($"api/chat/read/{contactId}");
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> ReadAllMessages()
+        {
+            var response = await _httpClient.GetAsync($"api/chat/read");
             return response.IsSuccessStatusCode;
         }
     }

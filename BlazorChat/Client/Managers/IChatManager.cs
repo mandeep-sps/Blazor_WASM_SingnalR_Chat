@@ -10,8 +10,9 @@ namespace BlazorChat.Client.Managers
         Task SaveMessageAsync(ChatMessage message);
         Task<List<ChatMessage>> GetConversationAsync(string contactId);
         Task<ApplicationUser> GetUserDetailsAsync(string userId);
-        Task<bool> ReadAllMessages(string contactId);
+        Task<bool> ReadMessages(string contactId);
+        Task<bool> ReadAllMessages();
 
-        Task<string> GetUsersAsync1();
+        Task<int> GetTotalUnreadCountAsync();
     }
 }

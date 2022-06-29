@@ -1,4 +1,5 @@
 
+using BlazorChat.Client.Pages;
 using BlazorChat.Client.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -24,6 +25,7 @@ builder.Services.AddTransient<IChatManager, ChatManager>();
 builder.Services.AddTransient<IUserManager, UserManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<LoginDisplay>();
+builder.Services.AddScoped<Chat>();
 
 builder.Services.AddScoped<ICookie, Cookie>();
 await builder.Build().RunAsync();

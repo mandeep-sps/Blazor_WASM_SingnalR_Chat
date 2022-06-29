@@ -63,6 +63,24 @@ namespace BlazorChat.Server.Controllers
 
             return Ok(applicationUsers.OrderByDescending(x => x.SenderDate).ToList());
         }
+
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetTotalUnreadCountAsync()
+        {
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId)
+                .Include(i => i.ChatMessagesFromUsers).AsNoTracking().ToListAsync();
+
+            var count = 0;
+
+            foreach (var item in allUsers)
+            {
+                count += item.ChatMessagesFromUsers.Count(h => (h.FromUserId == item.Id && h.ToUserId == userId) && (!h.IsRead));
+            }
+            return Ok(count);
+        }
+
+
         [HttpGet("users/{userId}")]
         public async Task<IActionResult> GetUserDetailsAsync(string userId)
         {
@@ -84,6 +102,29 @@ namespace BlazorChat.Server.Controllers
 
             return Ok(await _context.SaveChangesAsync());
         }
+
+        [HttpGet("read")]
+        public async Task<IActionResult> ReadAllMessages()
+        {
+            var userId = User.Claims.Where(a => a.Type == "Id").Select(a => a.Value).FirstOrDefault();
+            var allUsers = await _context.ApplicationUsers.Where(user => user.Id != userId)
+                .Include(i => i.ChatMessagesFromUsers).AsNoTracking().ToListAsync();
+
+            foreach (var item in allUsers)
+            {
+                var messages = await _context.ChatMessages
+                    .Where(h => (h.FromUserId == item.Id && h.ToUserId == userId) && !h.IsRead).AsNoTracking().ToListAsync();
+                if (messages.Any())
+                {
+                    messages.ForEach(x => x.IsRead = true);
+
+                    _context.UpdateRange(messages);
+                }
+            }
+
+            return Ok(await _context.SaveChangesAsync());
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveMessageAsync(ChatMessage message)
         {

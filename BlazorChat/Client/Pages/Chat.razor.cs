@@ -116,14 +116,15 @@ namespace BlazorChat.Client.Pages
             ContactEmail = contact.Email;
             ContactName = contact.Name;
             _navigationManager.NavigateTo($"chat/{ContactId}");
-            await _chatManager.ReadAllMessages(ContactId);
+            await _chatManager.ReadMessages(ContactId);
+            //await LoginDisplay.GetUnreadCount();
             messages = new List<ChatMessage>();
             messages = await _chatManager.GetConversationAsync(ContactId);
             ChatUsersList = await _chatManager.GetUsersAsync();
             ChatUsers = ChatUsersList;
             isVisibleChat = false;
         }
-        private async Task GetUsersAsync(bool stateChanged = false)
+        public async Task GetUsersAsync(bool stateChanged = false)
         {
             isVisibleContact = true;
             ChatUsersList = await _chatManager.GetUsersAsync();

@@ -1,6 +1,9 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using BlazorChat.Client.Pages
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @inject IUserManager UserManager
+@inject IChatManager ChatManager
+@inject Chat ChatRazor
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <AuthorizeView>
@@ -15,6 +18,13 @@
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="text-transform: none;letter-spacing: 1.5px;" Class="mr-2 email">
                 Hi, @(!string.IsNullOrEmpty(Email) ? Email.ToLower(): Name)
             </MudButton>
+
+            <MudBadge Content="@TotalUnreadCount" Visible="@isUnreadCount" Color="Color.Error" Overlap="true" Class="mx-6 my-4">
+                <MudTooltip Text="@UnreadCountTitle">
+                    <MudIconButton Variant="Variant.Outlined" Color="Color.Surface" Icon="@Icons.Filled.Notifications" OnClick="ReadAllUnreadMessages"></MudIconButton>
+                </MudTooltip>
+            </MudBadge>
+
             <MudTooltip Text="Click to Sign out">
                 <MudIconButton Variant="Variant.Filled" Color="Color.Error" Icon="@Icons.Filled.Logout" OnClick="BeginSignOut"></MudIconButton>
             </MudTooltip>
@@ -40,6 +50,9 @@
     public string title { get; set; }
     private MudTheme _theme = new();
     public bool _isDarkMode = false;
+    public bool isUnreadCount = false;
+    public string UnreadCountTitle { get; set; }
+    public int TotalUnreadCount { get; set; } = 0;
 
     private async Task BeginSignOut(MouseEventArgs args)
     {
@@ -82,6 +95,9 @@
                     _isDarkMode = IsDark;
                     collapse = true;
                 }
+
+                await GetUnreadCount();
+
             }
         }
         else
@@ -114,4 +130,48 @@
         }
     }
 
+    private async Task ReadAllUnreadMessages(MouseEventArgs args)
+    {
+        if (isUnreadCount)
+        {
+            var parameters = new DialogParameters();
+            parameters.Add("ContentText", "Are you sure you want to mark all messages as read?");
+            parameters.Add("ButtonText", "Yes");
+            parameters.Add("Color", Color.Error);
+
+            var result = Dialog.Show<ConfirmDialog>
+    ("Confirm", parameters, new DialogOptions { DisableBackdropClick = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+            var res = await result.GetReturnValueAsync<bool?>();
+            if (Convert.ToBoolean(res))
+            {
+                var isSuccess = await ChatManager.ReadAllMessages();
+                if (isSuccess)
+                {
+                    _snackBar.Add("All message marked as read", Severity.Success);
+
+                    //await ChatRazor.GetUsersAsync();
+                    await GetUnreadCount();
+                }
+                else
+                {
+                    _snackBar.Add("There is some issue", Severity.Error);
+                }
+
+            }
+        }
+        else
+        {
+            _snackBar.Add("You don't have any message to mark as read.", Severity.Warning);
+        }
     }
+
+
+    public async Task GetUnreadCount()
+    {
+        TotalUnreadCount = await ChatManager.GetTotalUnreadCountAsync();
+
+        isUnreadCount = TotalUnreadCount > 0 ? true : false;
+
+        UnreadCountTitle = TotalUnreadCount > 0 ? $"You have {TotalUnreadCount} unread message{(TotalUnreadCount > 1 ? "s" : "")}" : "No unread message yet";
+    }
+        }
