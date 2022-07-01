@@ -6,6 +6,9 @@
     <BlazorWebAssemblyPreserveCollationData>false</BlazorWebAssemblyPreserveCollationData>
     <PublishTrimmed>true</PublishTrimmed>
     <BlazorEnableCompression>true</BlazorEnableCompression>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TrimMode>link</TrimMode>
+    <!--<RunAOTCompilation>true</RunAOTCompilation>-->
   </PropertyGroup>
 
   <ItemGroup>

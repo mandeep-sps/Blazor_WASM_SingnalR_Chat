@@ -1,8 +1,6 @@
 ﻿
 
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
 {

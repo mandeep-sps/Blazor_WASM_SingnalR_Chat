@@ -35,11 +35,6 @@ namespace BlazorChat.Server
                    .AllowCredentials();
         }));
             services.AddSignalR();
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-            });
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
