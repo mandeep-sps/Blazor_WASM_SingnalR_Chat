@@ -8,6 +8,8 @@
     <BlazorEnableCompression>true</BlazorEnableCompression>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TrimMode>link</TrimMode>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <!--<RunAOTCompilation>true</RunAOTCompilation>-->
   </PropertyGroup>
 
